@@ -16,9 +16,9 @@ There are lots of way to patch the binary, but as described above, we will print
 
 Original code:
 
-<img src="images/original_code">
+<img src="images/original_code.png">
 
-<img src="images/original_disassembly">
+<img src="images/original_disassembly.png">
 
 Patched Code:
 
