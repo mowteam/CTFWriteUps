@@ -12,7 +12,7 @@ Running the binary and opening it in binja (my favorite decompiler <3), we see t
 Looking closer at the disassembly, it appears to check character by character for a string of length 6. If a character is valid, it increments the count (rsi) by one until it equals 6. If we believed in reverse engineering, we may try to understand the code and predict each of the characters. However, we can just patch the binary (using my favorite decompiler binja <3) to print out the number of correct characters at the end, allowing us to brute force byte-by-byte.
 
 ## Brute Force > Rev
-There are lots of way to patch the binary, but as described above, we will print/send some information about the number of character characters. We do this by returning the count variable once the program reaches the end.
+There are lots of way to patch the binary, but as described above, we will print/send some information about the number of correct characters. We do this by editing the return value to equal the count variable when the input fails.
 
 Original code:
 
