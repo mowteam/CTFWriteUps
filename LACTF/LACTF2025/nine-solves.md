@@ -7,7 +7,7 @@ This challenge gives us a binary (nine-solves), which is linked in the repo, as 
 ### Rev?
 Running the binary and opening it in binja, we see this is a classic rev challenge, where we must figure out the access code and send it to the server to get the flag.
 
-<img src="images/binja.png", width="500">
+<img src="images/binja.png">
 
 Looking closer at the disassembly, it appears to check character by character for a string of length 6. If a character is valid, it increments the count (rsi) by one until it equals 6. If we believed in reverse engineering, we may try to understand the code and predict each of the characters. However, we can just patch the binary to print out the number of correct characters at the end, allowing us to brute force byte-by-byte.
 
@@ -16,13 +16,13 @@ There are lots of way to patch the binary, but as described above, we will print
 
 Original code:
 
-<img src="images/original_code", width="300">
+<img src="images/original_code">
 
-<img src="images/original_disassembly", width="500">
+<img src="images/original_disassembly">
 
 Patched Code:
 
-<img src="images/patch.png", width="400">
+<img src="images/patch.png">
 
 With the program patched, we create a simple brute force script that goes byte-by-byte, checking for an increment in the return value. We also account for the final character, which will not fail, by checking for the flag output. In my case, I created a test "flag.txt" containing "test".
 
