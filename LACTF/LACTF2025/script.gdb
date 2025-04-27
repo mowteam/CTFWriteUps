@@ -8,6 +8,7 @@ set logging overwrite on
 #successful byte
 b *main + 138
 commands
+  silent
   #set $ans[$count] = $guess
   if $rsi == $count
     set $guess = 0
@@ -20,6 +21,7 @@ end
 #failed input
 b *main + 184
 commands
+  silent
   set $guess += 1
   set $ans[$count] = $guess
   set logging enabled on
