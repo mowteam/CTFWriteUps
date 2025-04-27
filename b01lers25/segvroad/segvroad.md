@@ -1,17 +1,19 @@
-# Challenge: segvroad - reversing challenge
+# Challenge: segvroad - reversing
 
 This challenge gives us a stripped aarch64 binary (segvroad), which is provided in the repo, as well as a nc connection. I have also put my solve script in the repo for reference.
 
 ## Reversing <3
-I won't bore you too much with the reversing process, but generally, I popped the binary into Ghidra (binja free doesn't support aarch64) and broke down the code piece by piece. Below is the annotated decmompiled code for main:
+I won't bore you too much with the reversing process, but generally, I popped the binary into Ghidra (binja free doesn't support aarch64) and broke down the code piece by piece. Below is the annotated decompiled code for main:
 
 <img src="../images/ghidra.png">
 
 I found that the program generates a time seeded random number called the "uid," which then acts as the seed for their PRNG used throughout the program. Since they print out the uid at the beginning of the program, we can always know the state of the process on the server.
 
-Next, we see the program is simulating a "minefield" or "maze" or "frogger" - whichever you want to imagine. The board is a 10x10 grid "randomly" generated using the uid discussed early, where each cell is either a 1 (mine) or 0 (safe). We start in the bottom left corner and must move to the top right corner to win a level. We must then repeat this ten times, where the board is regenerated each time, to get the flag. However, each round we must move the piece and the board updates the positions of the mines, as described [below](##Defining the Problem). The way the challenge checks whether you hit a mine or not is hilarious. Separate of the board, there is an mmaped region which acts a 10x10 grid of pages that map directly to the board. After each round, the pages are remapped with either no permissions (mine) or rw permission (safe). Then, the page corresponding to your new position is dereferenced. If it is a mine, the program will segfault and you lose!
+Next, we see the program is simulating a "minefield" or "maze" or "frogger" - whichever you want to imagine. The board is a 10x10 grid "randomly" generated using the uid discussed early, where each cell is either a 1 (mine) or 0 (safe). We start in the bottom left corner and must move to the top right corner to win a level. We must then repeat this ten times, where the board is regenerated each time, to get the flag. However, each time we move, the board updates according to the rules described below.
 
 <img src="../images/board-example.png">
+
+After you move and the board updates, the program checks whether you hit a mine or not using a funny method. Separate of the board, there is an mmaped region which acts a 10x10 grid of pages. After each round, the pages are remapped with either no permissions (mine) or rw permission (safe) as decribed by our board. Then, the page corresponding to your new position is dereferenced. If it is a mine, the program will segfault and you lose!
 
 ## Defining the Problem
 If we look at the board generation and update algo, we see everything is done on a per row basis. In `initialize()`, each row is randomly assigned a "row option" integer in [0, 2] except for the first and last rows which have option 3. These are used to both initialize the rows and also update them after each round
